@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TAAVO - Trade Without Borders</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f7fb;
+    color: #172033;
+}
+
+header {
+    background: #07111f;
+    color: white;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.logo {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.tagline {
+    font-size: 12px;
+    color: #b9c7d8;
+}
+
+nav {
+    background: #0d1b2a;
+    padding: 10px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+nav button,
+button {
+    border: none;
+    padding: 11px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+nav button {
+    background: #1c3047;
+    color: white;
+}
+
+nav button:hover {
+    background: #284a69;
+}
+
+.container {
+    width: min(1200px, 94%);
+    margin: auto;
+}
+
+section {
+    display: none;
+    padding: 25px 0;
+}
+
+section.active {
+    display: block;
+}
+
+.hero {
+    background: linear-gradient(135deg, #07111f, #173b5d);
+    color: white;
+    padding: 45px 25px;
+    border-radius: 18px;
+    margin-top: 25px;
+}
+
+.hero h1 {
+    font-size: 42px;
+    margin: 0 0 10px;
+}
+
+.hero p {
+    color: #d5e2ef;
+    max-width: 700px;
+    line-height: 1.6;
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccd5df;
+    border-radius: 8px;
+    font-size: 15px;
+    background: white;
+}
+
+.search-box input {
+    flex: 1;
+    min-width: 220px;
+}
+
+.primary {
+    background: #0b7cff;
+    color: white;
+}
+
+.success {
+    background: #159957;
+    color: white;
+}
+
+.dark {
+    background: #172033;
+    color: white;
+}
+
+.danger {
+    background: #d83b3b;
+    color: white;
+}
+
+.card {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    margin: 18px 0;
+    box-shadow: 0 5px 20px rgba(0,0,0,.07);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.stat {
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    background: #eef5ff;
+}
+
+.stat strong {
+    display: block;
+    font-size: 30px;
+    margin-top: 8px;
+}
+
+.product {
+    border: 1px solid #e1e7ee;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+}
+
+.message {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    display: none;
+}
+
+.message.show {
+    display: block;
+}
+
+.success-msg {
+    background: #e5f8ee;
+    color: #08733d;
+}
+
+.error-msg {
+    background: #ffe9e9;
+    color: #a40000;
+}
+
+.info-msg {
+    background: #e8f2ff;
+    color: #0756a3;
+}
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    background: #eef2f6;
+    font-size: 13px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #999;
+}
+
+.status-online .status-dot {
+    background: #15a05a;
+}
+
+.status-offline .status-dot {
+    background: #d33;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.small {
+    font-size: 13px;
+    color: #697586;
+}
+
+.result-box {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f3f7fb;
+    border-radius: 10px;
+    line-height: 1.6;
+}
+
+footer {
+    margin-top: 40px;
+    padding: 25px;
+    background: #07111f;
+    color: #b9c7d8;
+    text-align: center;
+}
+
+@media(max-width:600px) {
+    .hero h1 {
+        font-size: 30px;
+    }
+
+    header {
+        justify-content: center;
+        text-align: center;
+    }
+
+    nav button {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div>
+        <div class="logo">TAAVO</div>
+        <div class="tagline">Trade Without Borders</div>
+    </div>
+
+    <div id="backendStatus" class="status">
+        <span class="status-dot"></span>
+        <span id="backendStatusText">Checking Backend...</span>
+    </div>
+</header>
+
+<nav>
+    <button onclick="showSection('home')">Home</button>
+    <button onclick="showSection('buyer')">Buyer</button>
+    <button onclick="showSection('seller')">Seller Dashboard</button>
+    <button onclick="showSection('communication')">AI Communication</button>
+    <button onclick="showSection('negotiation')">Negotiation</button>
+    <button onclick="showSection('match')">AI Match</button>
+    <button onclick="showSection('account')">Account</button>
+</nav>
+
+<div class="container">
+
+<!-- HOME -->
+<section id="home" class="active">
+
+    <div class="hero">
+        <h1>TAAVO</h1>
+
+        <p>
+            Global B2B Trade Infrastructure.
+            Find products, connect with businesses,
+            communicate, negotiate and build global trade.
+        </p>
+
+        <div class="search-box">
+            <input id="homeSearch" placeholder="Search products, suppliers or requirements...">
+            <button class="primary" onclick="homeSearch()">Search</button>
+            <button class="success" onclick="showSection('buyer')">Create Buyer Request</button>
+            <button class="dark" onclick="showSection('match')">AI Match</button>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card">
+            <h2>🤖 TAAVO AI</h2>
+            <p>
+                AI-powered matching, translation and negotiation assistance
+                for global buyers and sellers.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>🌍 TAAVO Vision</h2>
+            <p>
+                Need → Match → Communicate → Negotiate → Order →
+                Pay → Ship → Track → Deliver → Support
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>🚀 TAAVO Mission</h2>
+            <p>
+                Build a global trade infrastructure connecting legitimate
+                businesses across borders.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- BUYER -->
+<section id="buyer">
+
+    <h1>Buyer Request</h1>
+
+    <div class="card">
+
+        <div class="form-grid">
+
+            <div>
+                <label>Product / Requirement</label>
+                <input id="productInput" placeholder="Example: Cotton T-Shirt">
+            </div>
+
+            <div>
+                <label>Quantity</label>
+                <input id="buyerQuantity" placeholder="Example: 5000">
+            </div>
+
+            <div>
+                <label>Budget</label>
+                <input id="buyerBudget" type="number" placeholder="Example: 10000">
+            </div>
+
+            <div>
+                <label>Currency</label>
+                <select id="buyerCurrency">
+                    <option>USD</option>
+                    <option>EUR</option>
+                    <option>BDT</option>
+                    <option>GBP</option>
+                    <option>CNY</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Target Country</label>
+                <input id="targetCountry" placeholder="Example: Bangladesh">
+            </div>
+
+        </div>
+
+        <br>
+
+        <button class="primary" onclick="submitBuyerRequest()">
+            Submit Buyer Request
+        </button>
+
+        <div id="buyerMessage" class="message"></div>
+
+    </div>
+
+    <div class="card">
+        <h2>Buyer Requests</h2>
+        <div id="buyerRequestList">
+            No buyer requests yet.
+        </div>
+    </div>
+
+</section>
+
+
+<!-- SELLER DASHBOARD -->
+<section id="seller">
+
+    <h1>Seller Dashboard</h1>
+
+    <div class="grid">
+
+        <div class="stat">
+            <span>Verification</span>
+            <strong id="verificationStat">❌</strong>
+        </div>
+
+        <div class="stat">
+            <span>Published Products</span>
+            <strong id="productStat">0</strong>
+        </div>
+
+        <div class="stat">
+            <span>Buyer Requests</span>
+            <strong id="requestStat">0</strong>
+        </div>
+
+    </div>
+
+    <!-- Verification -->
+    <div class="card">
+
+        <h2>Business Verification</h2>
+
+        <div class="form-grid">
+
+            <div>
+                <label>Company Name</label>
+                <input id="companyName" placeholder="Company name">
+            </div>
+
+            <div>
+                <label>Business Country</label>
+                <input id="businessCountry" placeholder="Country">
+            </div>
+
+            <div>
+                <label>Business Website</label>
+                <input id="businessWebsite" placeholder="Website">
+            </div>
+
+        </div>
+
+        <br>
+
+        <button class="success" onclick="verifyBusiness()">
+            Verify Business
+        </button>
+
+        <div id="verificationMessage" class="message"></div>
+
+    </div>
+
+
+    <!-- Add Product -->
+    <div class="card">
+
+        <h2>Add Product</h2>
+
+        <div class="form-grid">
+
+            <div>
+                <label>Product Name</label>
+                <input id="productName" placeholder="Product name">
+            </div>
+
+            <div>
+                <label>Description</label>
+                <textarea id="productDescription" placeholder="Product description"></textarea>
+            </div>
+
+            <div>
+                <label>Price</label>
+                <input id="productPrice" type="number" placeholder="Price">
+            </div>
+
+            <div>
+                <label>Currency</label>
+                <select id="productCurrency">
+                    <option>USD</option>
+                    <option>EUR</option>
+                    <option>BDT</option>
+                    <option>GBP</option>
+                    <option>CNY</option>
+                </select>
+            </div>
+
+            <div>
+                <label>MOQ</label>
+                <input id="productMOQ" type="number" placeholder="Minimum Order Quantity">
+            </div>
+
+            <div>
+                <label>Seller Country</label>
+                <input id="sellerCountry" placeholder="Country">
+            </div>
+
+        </div>
+
+        <br>
+
+        <button class="primary" onclick="publishProduct()">
+            Publish Product
+        </button>
+
+        <div id="productMessage" class="message"></div>
+
+    </div>
+
+
+    <!-- Products -->
+    <div class="card">
+
+        <h2>Published Products</h2>
+
+        <div id="publishedProducts">
+            No products published yet.
+        </div>
+
+    </div>
+
+
+    <!-- Seller Requests -->
+    <div class="card">
+
+        <h2>Buyer Requests</h2>
+
+        <div id="sellerRequestList">
+            No buyer requests available.
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- PRODUCT DETAILS -->
+<section id="productDetailsSection">
+
+    <h1>Product Details</h1>
+
+    <div id="productDetails" class="card">
+        Select a product to view details.
+    </div>
+
+</section>
+
+
+<!-- SELLER PROFILE -->
+<section id="sellerProfileSection">
+
+    <h1>Seller Profile</h1>
+
+    <div id="sellerProfile" class="card">
+        Seller profile will appear here.
+    </div>
+
+</section>
+
+
+<!-- AI MATCH -->
+<section id="match">
+
+    <h1>🤖 TAAVO AI Match</h1>
+
+    <div class="card">
+
+        <div class="form-grid">
+
+            <div>
+                <label>Product</label>
+                <input id="aiMatchInput" placeholder="What do you need?">
+            </div>
+
+            <div>
+                <label>Quantity</label>
+                <input id="aiMatchQuantity" type="number">
+            </div>
+
+            <div>
+                <label>Budget</label>
+                <input id="aiMatchBudget" type="number">
+            </div>
+
+            <div>
+                <label>Target Country</label>
+                <input id="aiMatchCountry">
+            </div>
+
+        </div>
+
+        <br>
+
+        <button class="primary" onclick="runAIMatch()">
+            Find AI Matches
+        </button>
+
+    </div>
+
+    <div id="aiMatchResults" class="card">
+        Enter your requirement and start AI Match.
+    </div>
+
+</section>
+
+
+<!-- COMMUNICATION -->
+<section id="communication">
+
+    <h1>🌍 AI Communication</h1>
+
+    <div class="card">
+
+        <div class="form-grid">
+
+            <div>
+                <label>Buyer Language</label>
+
+                <select id="buyerLanguage">
+                    <option>English</option>
+                    <option>Bangla</option>
+                    <option>Arabic</option>
+                    <option>Chinese</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Seller Language</label>
+
+                <select id="sellerLanguage">
+                    <option>English</option>
+                    <option>Bangla</option>
+                    <option>Arabic</option>
+                    <option>Chinese</option>
+                </select>
+            </div>
+
+        </div>
+
+        <br>
+
+        <label>Message</label>
+
+        <textarea id="communicationMessage"
+            placeholder="Write your trade message..."></textarea>
+
+        <br><br>
+
+        <button class="primary" onclick="translateCommunication()">
+            AI Translate
+        </button>
+
+        <div id="communicationResult" class="result-box">
+            Translation result will appear here.
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- NEGOTIATION -->
+<section id="negotiation">
+
+    <h1>🤝 Negotiation Assistant</h1>
+
+    <div class="card">
+
+        <div class="form-grid">
+
+            <div>
+                <label>Offer Price</label>
+                <input id="negotiationPrice" type="number">
+            </div>
+
+            <div>
+                <label>Quantity</label>
+                <input id="negotiationQuantity" type="number">
+            </div>
+
+            <div>
+                <label>Delivery</label>
+                <input id="negotiationDelivery"
+                    placeholder="Example: 30 days">
+            </div>
+
+        </div>
+
+        <br>
+
+        <label>Terms</label>
+
+        <textarea id="negotiationTerms"
+            placeholder="Payment terms, quality, shipping, etc."></textarea>
+
+        <br><br>
+
+        <button class="primary" onclick="prepareNegotiation()">
+            Prepare Negotiation
+        </button>
+
+        <div id="negotiationResult" class="result-box">
+            Negotiation assistant result will appear here.
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ACCOUNT -->
+<section id="account">
+
+    <h1>Account</h1>
+
+    <!-- Logged In -->
+    <div id="loggedInArea" class="card hidden">
+
+        <h2>Welcome to TAAVO</h2>
+
+        <p><strong>Name:</strong> <span id="accountName"></span></p>
+        <p><strong>Email:</strong> <span id="accountEmail"></span></p>
+        <p><strong>Role:</strong> <span id="accountRole"></span></p>
+
+        <button class="danger" onclick="logout()">
+            Logout
+        </button>
+
+    </div>
+
+
+    <!-- Login -->
+    <div id="loginArea" class="card">
+
+        <h2>Login</h2>
+
+        <label>Email</label>
+        <input id="loginEmail" type="email" placeholder="Email">
+
+        <br><br>
+
+        <label>Password</label>
+        <input id="loginPassword" type="password" placeholder="Password">
+
+        <br><br>
+
+        <button class="primary" onclick="login()">
+            Login
+        </button>
+
+        <div id="loginMessage" class="message"></div>
+
+    </div>
+
+
+    <!-- Signup -->
+    <div id="signupArea" class="card">
+
+        <h2>Create TAAVO Account</h2>
+
+        <label>Name</label>
+        <input id="signupName" placeholder="Your name">
+
+        <br><br>
+
+        <label>Email</label>
+        <input id="signupEmail" type="email" placeholder="Email">
+
+        <br><br>
+
+        <label>Password</label>
+        <input id="signupPassword" type="password" placeholder="Password">
+
+        <br><br>
+
+        <label>Role</label>
+
+        <select id="signupRole">
+            <option value="Buyer">Buyer</option>
+            <option value="Seller">Seller</option>
+        </select>
+
+        <br><br>
+
+        <button class="success" onclick="signup()">
+            Sign Up
+        </button>
+
+        <div id="signupMessage" class="message"></div>
+
+    </div>
+
+</section>
+
+</div>
+
+
+<footer>
+    <strong>TAAVO</strong> — Trade Without Borders
+    <br>
+    Need → Match → Communicate → Negotiate → Order → Pay → Ship → Track → Deliver → Support
+</footer>
+
+
+<script>
+
+/* =========================================================
+   TAAVO BACKEND
+   ========================================================= */
+
+const TAAVO_BACKEND = "http://127.0.0.1:8001";
+
+
+/* =========================================================
+   LOCAL STATE
+   ========================================================= */
+
+let sellerProducts =
+    JSON.parse(localStorage.getItem("taavo_products") || "[]");
+
+let buyerRequests =
+    JSON.parse(localStorage.getItem("taavo_requests") || "[]");
+
+let currentUser =
+    JSON.parse(localStorage.getItem("taavo_user") || "null");
+
+let businessVerified =
+    localStorage.getItem("taavo_verified") === "true";
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+function showSection(id) {
+
+    document.querySelectorAll("section").forEach(section => {
+        section.classList.remove("active");
+    });
+
+    const section = document.getElementById(id);
+
+    if (section) {
+        section.classList.add("active");
+        window.scrollTo({top: 0, behavior: "smooth"});
+    }
+}
+
+
+/* =========================================================
+   MESSAGE HELPER
+   ========================================================= */
+
+function showMessage(elementId, message, type) {
+
+    const element = document.getElementById(elementId);
+
+    if (!element) return;
+
+    element.textContent = message;
+
+    element.className = "message show";
+
+    if (type === "success") {
+        element.classList.add("success-msg");
+    } else if (type === "error") {
+        element.classList.add("error-msg");
+    } else {
+        element.classList.add("info-msg");
+    }
+}
+
+
+/* =========================================================
+   BACKEND REQUEST HELPER
+   ========================================================= */
+
+async function apiRequest(endpoint, options = {}) {
+
+    const response = await fetch(
+        TAAVO_BACKEND + endpoint,
+        {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                ...(options.headers || {})
+            }
+        }
+    );
+
+    const text = await response.text();
+
+    let data;
+
+    try {
+        data = JSON.parse(text);
+    } catch {
+        throw new Error(
+            "Backend returned an invalid response."
+        );
+    }
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.detail ||
+            data.message ||
+            "Backend request failed."
+        );
+    }
+
+    return data;
+}
+
+
+/* =========================================================
+   BACKEND STATUS
+   ========================================================= */
+
+async function testBackend() {
+
+    const statusBox =
+        document.getElementById("backendStatus");
+
+    const statusText =
+        document.getElementById("backendStatusText");
+
+    try {
+
+        const data =
+            await apiRequest("/api/status");
+
+        if (data.success) {
+
+            statusBox.classList.add("status-online");
+            statusBox.classList.remove("status-offline");
+
+            statusText.textContent =
+                "TAAVO Backend Online";
+        }
+
+    } catch (error) {
+
+        statusBox.classList.add("status-offline");
+        statusBox.classList.remove("status-online");
+
+        statusText.textContent =
+            "Backend Offline";
+    }
+}
+
+
+/* =========================================================
+   SIGN UP
+   ========================================================= */
+
+async function signup() {
+
+    const name =
+        document.getElementById("signupName").value.trim();
+
+    const email =
+        document.getElementById("signupEmail").value.trim();
+
+    const password =
+        document.getElementById("signupPassword").value;
+
+    const role =
+        document.getElementById("signupRole").value;
+
+
+    if (!name || !email || !password) {
+
+        showMessage(
+            "signupMessage",
+            "Please fill all signup fields.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    showMessage(
+        "signupMessage",
+        "Creating TAAVO account...",
+        "info"
+    );
+
+
+    try {
+
+        const data = await apiRequest(
+            "/api/signup",
+            {
+                method: "POST",
+
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    password: password,
+                    role: role
+                })
+            }
+        );
+
+
+        if (data.status === "success") {
+
+            currentUser = data.user;
+
+            localStorage.setItem(
+                "taavo_user",
+                JSON.stringify(currentUser)
+            );
+
+
+            updateAccountUI();
+
+
+            showMessage(
+                "signupMessage",
+                "✓ TAAVO account created successfully!",
+                "success"
+            );
+
+        } else {
+
+            showMessage(
+                "signupMessage",
+                data.message || "Signup failed.",
+                "error"
+            );
+        }
+
+
+    } catch (error) {
+
+        showMessage(
+            "signupMessage",
+            "× Signup failed: " + error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+async function login() {
+
+    const email =
+        document.getElementById("loginEmail").value.trim();
+
+    const password =
+        document.getElementById("loginPassword").value;
+
+
+    if (!email || !password) {
+
+        showMessage(
+            "loginMessage",
+            "Please enter email and password.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    showMessage(
+        "loginMessage",
+        "Logging in...",
+        "info"
+    );
+
+
+    try {
+
+        const data = await apiRequest(
+            "/api/login",
+            {
+                method: "POST",
+
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            }
+        );
+
+
+        if (data.status === "success") {
+
+            currentUser = data.user;
+
+            localStorage.setItem(
+                "taavo_user",
+                JSON.stringify(currentUser)
+            );
+
+
+            updateAccountUI();
+
+
+            showMessage(
+                "loginMessage",
+                "✓ Login successful!",
+                "success"
+            );
+
+        } else {
+
+            showMessage(
+                "loginMessage",
+                data.message || "Login failed.",
+                "error"
+            );
+        }
+
+
+    } catch (error) {
+
+        showMessage(
+            "loginMessage",
+            "× Login failed: " + error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   ACCOUNT UI
+   ========================================================= */
+
+function updateAccountUI() {
+
+    const loggedInArea =
+        document.getElementById("loggedInArea");
+
+    const loginArea =
+        document.getElementById("loginArea");
+
+    const signupArea =
+        document.getElementById("signupArea");
+
+
+    if (currentUser) {
+
+        loggedInArea.classList.remove("hidden");
+
+        loginArea.classList.add("hidden");
+
+        signupArea.classList.add("hidden");
+
+
+        document.getElementById("accountName")
+            .textContent = currentUser.name || "";
+
+        document.getElementById("accountEmail")
+            .textContent = currentUser.email || "";
+
+        document.getElementById("accountRole")
+            .textContent = currentUser.role || "";
+
+    } else {
+
+        loggedInArea.classList.add("hidden");
+
+        loginArea.classList.remove("hidden");
+
+        signupArea.classList.remove("hidden");
+    }
+}
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+function logout() {
+
+    currentUser = null;
+
+    localStorage.removeItem("taavo_user");
+
+    updateAccountUI();
+
+    showSection("home");
+}
+
+
+/* =========================================================
+   BUYER REQUEST
+   ========================================================= */
+
+async function submitBuyerRequest() {
+
+    const requirement =
+        document.getElementById("productInput").value.trim();
+
+    const quantity =
+        document.getElementById("buyerQuantity").value.trim();
+
+    const budget =
+        document.getElementById("buyerBudget").value.trim();
+
+    const currency =
+        document.getElementById("buyerCurrency").value;
+
+    const targetCountry =
+        document.getElementById("targetCountry").value.trim();
+
+
+    if (!requirement) {
+
+        showMessage(
+            "buyerMessage",
+            "Please enter your requirement.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const data = await apiRequest(
+            "/api/buyer-requests",
+            {
+                method: "POST",
+
+                body: JSON.stringify({
+                    requirement: requirement,
+                    quantity: quantity,
+                    budget: budget,
+                    currency: currency,
+                    targetCountry: targetCountry
+                })
+            }
+        );
+
+
+        if (data.status === "success") {
+
+            buyerRequests.push(data.request);
+
+            localStorage.setItem(
+                "taavo_requests",
+                JSON.stringify(buyerRequests)
+            );
+
+
+            renderBuyerRequests();
+
+            updateStats();
+
+
+            showMessage(
+                "buyerMessage",
+                "✓ Buyer request created successfully!",
+                "success"
+            );
+
+
+            document.getElementById("productInput").value = "";
+            document.getElementById("buyerQuantity").value = "";
+            document.getElementById("buyerBudget").value = "";
+            document.getElementById("targetCountry").value = "";
+
+        }
+
+
+    } catch (error) {
+
+        showMessage(
+            "buyerMessage",
+            "× Buyer request failed: " + error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   RENDER BUYER REQUESTS
+   ========================================================= */
+
+function renderBuyerRequests() {
+
+    const buyerList =
+        document.getElementById("buyerRequestList");
+
+    const sellerList =
+        document.getElementById("sellerRequestList");
+
+
+    if (buyerRequests.length === 0) {
+
+        buyerList.innerHTML =
+            "No buyer requests yet.";
+
+        sellerList.innerHTML =
+            "No buyer requests available.";
+
+        return;
+    }
+
+
+    let html = "";
+
+    buyerRequests.forEach((request, index) => {
+
+        html += `
+            <div class="product">
+
+                <h3>${escapeHTML(request.requirement)}</h3>
+
+                <p>
+                    Quantity:
+                    ${escapeHTML(request.quantity || "-")}
+                </p>
+
+                <p>
+                    Budget:
+                    ${escapeHTML(request.budget || "-")}
+                    ${escapeHTML(request.currency || "")}
+                </p>
+
+                <p>
+                    Target Country:
+                    ${escapeHTML(request.targetCountry || "-")}
+                </p>
+
+                <button
+                    class="primary"
+                    onclick="matchRequest(${index})">
+                    AI Match
+                </button>
+
+            </div>
+        `;
+    });
+
+
+    buyerList.innerHTML = html;
+
+    sellerList.innerHTML = html;
+}
+
+
+/* =========================================================
+   BUSINESS VERIFICATION
+   ========================================================= */
+
+function verifyBusiness() {
+
+    const company =
+        document.getElementById("companyName").value.trim();
+
+    const country =
+        document.getElementById("businessCountry").value.trim();
+
+
+    if (!company || !country) {
+
+        showMessage(
+            "verificationMessage",
+            "Please enter company name and country.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    businessVerified = true;
+
+    localStorage.setItem(
+        "taavo_verified",
+        "true"
+    );
+
+
+    document.getElementById(
+        "verificationStat"
+    ).textContent = "✓";
+
+
+    showMessage(
+        "verificationMessage",
+        "✓ Business verification submitted successfully.",
+        "success"
+    );
+}
+
+
+/* =========================================================
+   PUBLISH PRODUCT
+   ========================================================= */
+
+async function publishProduct() {
+
+    const name =
+        document.getElementById("productName").value.trim();
+
+    const description =
+        document.getElementById("productDescription").value.trim();
+
+    const price =
+        Number(document.getElementById("productPrice").value);
+
+    const currency =
+        document.getElementById("productCurrency").value;
+
+    const moq =
+        Number(document.getElementById("productMOQ").value);
+
+    const country =
+        document.getElementById("sellerCountry").value.trim();
+
+
+    if (!name || !price || !moq || !country) {
+
+        showMessage(
+            "productMessage",
+            "Please fill the required product fields.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const data = await apiRequest(
+            "/api/products",
+            {
+                method: "POST",
+
+                body: JSON.stringify({
+                    name: name,
+                    description: description,
+                    price: price,
+                    currency: currency,
+                    moq: moq,
+                    country: country,
+                    seller: currentUser
+                        ? currentUser.name
+                        : "TAAVO Seller"
+                })
+            }
+        );
+
+
+        if (data.status === "success") {
+
+            sellerProducts.push(data.product);
+
+            localStorage.setItem(
+                "taavo_products",
+                JSON.stringify(sellerProducts)
+            );
+
+
+            renderProducts();
+
+            updateStats();
+
+
+            showMessage(
+                "productMessage",
+                "✓ Product published successfully!",
+                "success"
+            );
+
+
+            document.getElementById("productName").value = "";
+            document.getElementById("productDescription").value = "";
+            document.getElementById("productPrice").value = "";
+            document.getElementById("productMOQ").value = "";
+            document.getElementById("sellerCountry").value = "";
+
+        }
+
+
+    } catch (error) {
+
+        showMessage(
+            "productMessage",
+            "× Product publish failed: " + error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   RENDER PRODUCTS
+   ========================================================= */
+
+function renderProducts() {
+
+    const container =
+        document.getElementById("publishedProducts");
+
+
+    if (sellerProducts.length === 0) {
+
+        container.innerHTML =
+            "No products published yet.";
+
+        return;
+    }
+
+
+    let html = "";
+
+    sellerProducts.forEach((product, index) => {
+
+        html += `
+            <div class="product">
+
+                <h3>
+                    ${escapeHTML(product.name)}
+                </h3>
+
+                <p>
+                    ${escapeHTML(product.description || "")}
+                </p>
+
+                <p>
+                    <strong>
+                        ${escapeHTML(product.price)}
+                        ${escapeHTML(product.currency)}
+                    </strong>
+                </p>
+
+                <p>
+                    MOQ:
+                    ${escapeHTML(product.moq)}
+                </p>
+
+                <p>
+                    Country:
+                    ${escapeHTML(product.country)}
+                </p>
+
+                <p>
+                    Seller:
+                    ${escapeHTML(product.seller || "TAAVO Seller")}
+                </p>
+
+                <button
+                    class="dark"
+                    onclick="viewProduct(${index})">
+                    Product Details
+                </button>
+
+                <button
+                    class="primary"
+                    onclick="viewSeller(${index})">
+                    Seller Profile
+                </button>
+
+            </div>
+        `;
+    });
+
+
+    container.innerHTML = html;
+}
+
+
+/* =========================================================
+   PRODUCT DETAILS
+   ========================================================= */
+
+function viewProduct(index) {
+
+    const product = sellerProducts[index];
+
+    if (!product) return;
+
+
+    document.getElementById("productDetails").innerHTML = `
+
+        <h2>${escapeHTML(product.name)}</h2>
+
+        <p>
+            ${escapeHTML(product.description || "")}
+        </p>
+
+        <p>
+            <strong>Price:</strong>
+            ${escapeHTML(product.price)}
+            ${escapeHTML(product.currency)}
+        </p>
+
+        <p>
+            <strong>MOQ:</strong>
+            ${escapeHTML(product.moq)}
+        </p>
+
+        <p>
+            <strong>Country:</strong>
+            ${escapeHTML(product.country)}
+        </p>
+
+        <p>
+            <strong>Seller:</strong>
+            ${escapeHTML(product.seller || "TAAVO Seller")}
+        </p>
+
+        <button
+            class="primary"
+            onclick="showSection('negotiation')">
+            Start Negotiation
+        </button>
+    `;
+
+
+    showSection("productDetailsSection");
+}
+
+
+/* =========================================================
+   SELLER PROFILE
+   ========================================================= */
+
+function viewSeller(index) {
+
+    const product = sellerProducts[index];
+
+    if (!product) return;
+
+
+    document.getElementById("sellerProfile").innerHTML = `
+
+        <h2>${escapeHTML(product.seller || "TAAVO Seller")}</h2>
+
+        <p>
+            <strong>Country:</strong>
+            ${escapeHTML(product.country)}
+        </p>
+
+        <p>
+            <strong>Verification:</strong>
+            ${businessVerified ? "✓ Verified" : "Not verified"}
+        </p>
+
+        <p>
+            <strong>Products:</strong>
+            ${sellerProducts.length}
+        </p>
+    `;
+
+
+    showSection("sellerProfileSection");
+}
+
+
+/* =========================================================
+   AI MATCH
+   ========================================================= */
+
+function runAIMatch() {
+
+    const requirement =
+        document.getElementById("aiMatchInput").value
+            .trim()
+            .toLowerCase();
+
+    const quantity =
+        Number(document.getElementById("aiMatchQuantity").value);
+
+    const budget =
+        Number(document.getElementById("aiMatchBudget").value);
+
+    const country =
+        document.getElementById("aiMatchCountry").value
+            .trim()
+            .toLowerCase();
+
+
+    if (!requirement) {
+
+        document.getElementById(
+            "aiMatchResults"
+        ).innerHTML =
+            "Please enter what you need.";
+
+        return;
+    }
+
+
+    const results =
+        sellerProducts
+            .map(product => {
+
+                let score = 0;
+
+                const productText =
+                    (
+                        product.name +
+                        " " +
+                        product.description
+                    ).toLowerCase();
+
+
+                if (
+                    productText.includes(requirement) ||
+                    requirement.includes(product.name.toLowerCase())
+                ) {
+                    score += 50;
+                }
+
+
+                if (
+                    country &&
+                    product.country &&
+                    product.country.toLowerCase()
+                        .includes(country)
+                ) {
+                    score += 20;
+                }
+
+
+                if (
+                    budget &&
+                    Number(product.price) <= budget
+                ) {
+                    score += 20;
+                }
+
+
+                if (
+                    quantity &&
+                    Number(product.moq) <= quantity
+                ) {
+                    score += 10;
+                }
+
+
+                return {
+                    product,
+                    score
+                };
+            })
+            .filter(item => item.score > 0)
+            .sort((a,b) => b.score - a.score);
+
+
+    const container =
+        document.getElementById("aiMatchResults");
+
+
+    if (results.length === 0) {
+
+        container.innerHTML = `
+            <h3>No direct match found yet.</h3>
+            <p>
+                Try another product name or publish more products.
+            </p>
+        `;
+
+        return;
+    }
+
+
+    let html = "<h2>AI Match Results</h2>";
+
+
+    results.forEach(item => {
+
+        html += `
+
+            <div class="product">
+
+                <h3>
+                    ${escapeHTML(item.product.name)}
+                </h3>
+
+                <p>
+                    Match Score:
+                    <strong>${item.score}%</strong>
+                </p>
+
+                <p>
+                    Price:
+                    ${escapeHTML(item.product.price)}
+                    ${escapeHTML(item.product.currency)}
+                </p>
+
+                <p>
+                    Country:
+                    ${escapeHTML(item.product.country)}
+                </p>
+
+                <button
+                    class="primary"
+                    onclick="viewProduct(${sellerProducts.indexOf(item.product)})">
+                    View Product
+                </button>
+
+            </div>
+        `;
+    });
+
+
+    container.innerHTML = html;
+}
+
+
+/* =========================================================
+   MATCH REQUEST
+   ========================================================= */
+
+function matchRequest(index) {
+
+    const request = buyerRequests[index];
+
+    if (!request) return;
+
+
+    document.getElementById("aiMatchInput").value =
+        request.requirement;
+
+    document.getElementById("aiMatchQuantity").value =
+        request.quantity;
+
+    document.getElementById("aiMatchBudget").value =
+        request.budget;
+
+    document.getElementById("aiMatchCountry").value =
+        request.targetCountry;
+
+
+    showSection("match");
+
+    runAIMatch();
+}
+
+
+/* =========================================================
+   AI COMMUNICATION
+   ========================================================= */
+
+function translateCommunication() {
+
+    const from =
+        document.getElementById("buyerLanguage").value;
+
+    const to =
+        document.getElementById("sellerLanguage").value;
+
+    const message =
+        document.getElementById("communicationMessage")
+            .value.trim();
+
+
+    if (!message) {
+
+        document.getElementById(
+            "communicationResult"
+        ).textContent =
+            "Please write a message first.";
+
+        return;
+    }
+
+
+    document.getElementById(
+        "communicationResult"
+    ).innerHTML = `
+
+        <strong>TAAVO AI Communication Assistant</strong>
+
+        <p>
+            From: ${escapeHTML(from)}
+        </p>
+
+        <p>
+            To: ${escapeHTML(to)}
+        </p>
+
+        <p>
+            Message:
+            ${escapeHTML(message)}
+        </p>
+
+        <p>
+            AI translation layer ready.
+            Actual multilingual translation API can be connected next.
+        </p>
+    `;
+}
+
+
+/* =========================================================
+   NEGOTIATION
+   ========================================================= */
+
+function prepareNegotiation() {
+
+    const price =
+        document.getElementById("negotiationPrice").value;
+
+    const quantity =
+        document.getElementById("negotiationQuantity").value;
+
+    const delivery =
+        document.getElementById("negotiationDelivery").value;
+
+    const terms =
+        document.getElementById("negotiationTerms").value;
+
+
+    if (!price || !quantity) {
+
+        document.getElementById(
+            "negotiationResult"
+        ).textContent =
+            "Please enter offer price and quantity.";
+
+        return;
+    }
+
+
+    document.getElementById(
+        "negotiationResult"
+    ).innerHTML = `
+
+        <h3>TAAVO Negotiation Draft</h3>
+
+        <p>
+            <strong>Offer Price:</strong>
+            ${escapeHTML(price)}
+        </p>
+
+        <p>
+            <strong>Quantity:</strong>
+            ${escapeHTML(quantity)}
+        </p>
+
+        <p>
+            <strong>Delivery:</strong>
+            ${escapeHTML(delivery || "To be negotiated")}
+        </p>
+
+        <p>
+            <strong>Terms:</strong>
+            ${escapeHTML(terms || "Standard trade terms")}
+        </p>
+
+        <p>
+            Ready for buyer/seller negotiation.
+        </p>
+    `;
+}
+
+
+/* =========================================================
+   HOME SEARCH
+   ========================================================= */
+
+function homeSearch() {
+
+    const query =
+        document.getElementById("homeSearch")
+            .value.trim();
+
+    if (!query) return;
+
+
+    document.getElementById(
+        "aiMatchInput"
+    ).value = query;
+
+    showSection("match");
+
+    runAIMatch();
+}
+
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+function updateStats() {
+
+    document.getElementById(
+        "productStat"
+    ).textContent =
+        sellerProducts.length;
+
+    document.getElementById(
+        "requestStat"
+    ).textContent =
+        buyerRequests.length;
+
+    document.getElementById(
+        "verificationStat"
+    ).textContent =
+        businessVerified ? "✓" : "❌";
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+   ========================================================= */
+
+function escapeHTML(value) {
+
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =========================================================
+   START TAAVO
+   ========================================================= */
+
+renderProducts();
+renderBuyerRequests();
+updateStats();
+updateAccountUI();
+testBackend();
+
+</script>
+
+</body>
+</html>
