@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -257,6 +258,24 @@ label {
     line-height: 1.6;
 }
 
+.order-card {
+    border: 1px solid #dce5ef;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 15px;
+    background: #fff;
+}
+
+.order-status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 20px;
+    background: #fff4d6;
+    color: #805b00;
+    font-size: 13px;
+    font-weight: bold;
+}
+
 footer {
     margin-top: 40px;
     padding: 25px;
@@ -303,6 +322,7 @@ footer {
     <button onclick="showSection('communication')">AI Communication</button>
     <button onclick="showSection('negotiation')">Negotiation</button>
     <button onclick="showSection('match')">AI Match</button>
+    <button onclick="showSection('orders'); loadOrders()">Orders</button>
     <button onclick="showSection('account')">Account</button>
 </nav>
 
@@ -445,7 +465,6 @@ footer {
 
     </div>
 
-    <!-- Verification -->
     <div class="card">
 
         <h2>Business Verification</h2>
@@ -480,7 +499,6 @@ footer {
     </div>
 
 
-    <!-- Add Product -->
     <div class="card">
 
         <h2>Add Product</h2>
@@ -536,7 +554,6 @@ footer {
     </div>
 
 
-    <!-- Products -->
     <div class="card">
 
         <h2>Published Products</h2>
@@ -548,7 +565,6 @@ footer {
     </div>
 
 
-    <!-- Seller Requests -->
     <div class="card">
 
         <h2>Buyer Requests</h2>
@@ -736,12 +752,27 @@ footer {
 </section>
 
 
+<!-- ORDERS -->
+<section id="orders">
+
+    <h1>📦 TAAVO Orders</h1>
+
+    <div class="card">
+
+        <div id="ordersList">
+            Loading orders...
+        </div>
+
+    </div>
+
+</section>
+
+
 <!-- ACCOUNT -->
 <section id="account">
 
     <h1>Account</h1>
 
-    <!-- Logged In -->
     <div id="loggedInArea" class="card hidden">
 
         <h2>Welcome to TAAVO</h2>
@@ -757,7 +788,6 @@ footer {
     </div>
 
 
-    <!-- Login -->
     <div id="loginArea" class="card">
 
         <h2>Login</h2>
@@ -781,7 +811,6 @@ footer {
     </div>
 
 
-    <!-- Signup -->
     <div id="signupArea" class="card">
 
         <h2>Create TAAVO Account</h2>
@@ -836,7 +865,11 @@ footer {
    TAAVO BACKEND
    ========================================================= */
 
-const TAAVO_BACKEND = "http://127.0.0.1:8001";
+const TAAVO_BACKEND =
+    (window.location.hostname === "localhost" ||
+     window.location.hostname === "127.0.0.1")
+        ? "http://127.0.0.1:8001"
+        : "https://taavo.onrender.com";
 
 
 /* =========================================================
@@ -923,9 +956,7 @@ async function apiRequest(endpoint, options = {}) {
     try {
         data = JSON.parse(text);
     } catch {
-        throw new Error(
-            "Backend returned an invalid response."
-        );
+        throw new Error("Backend returned an invalid response.");
     }
 
     if (!response.ok) {
@@ -996,7 +1027,6 @@ async function signup() {
     const role =
         document.getElementById("signupRole").value;
 
-
     if (!name || !email || !password) {
 
         showMessage(
@@ -1008,13 +1038,11 @@ async function signup() {
         return;
     }
 
-
     showMessage(
         "signupMessage",
         "Creating TAAVO account...",
         "info"
     );
-
 
     try {
 
@@ -1032,7 +1060,6 @@ async function signup() {
             }
         );
 
-
         if (data.status === "success") {
 
             currentUser = data.user;
@@ -1042,9 +1069,7 @@ async function signup() {
                 JSON.stringify(currentUser)
             );
 
-
             updateAccountUI();
-
 
             showMessage(
                 "signupMessage",
@@ -1060,7 +1085,6 @@ async function signup() {
                 "error"
             );
         }
-
 
     } catch (error) {
 
@@ -1085,7 +1109,6 @@ async function login() {
     const password =
         document.getElementById("loginPassword").value;
 
-
     if (!email || !password) {
 
         showMessage(
@@ -1097,13 +1120,11 @@ async function login() {
         return;
     }
 
-
     showMessage(
         "loginMessage",
         "Logging in...",
         "info"
     );
-
 
     try {
 
@@ -1119,7 +1140,6 @@ async function login() {
             }
         );
 
-
         if (data.status === "success") {
 
             currentUser = data.user;
@@ -1129,9 +1149,7 @@ async function login() {
                 JSON.stringify(currentUser)
             );
 
-
             updateAccountUI();
-
 
             showMessage(
                 "loginMessage",
@@ -1147,7 +1165,6 @@ async function login() {
                 "error"
             );
         }
-
 
     } catch (error) {
 
@@ -1175,15 +1192,11 @@ function updateAccountUI() {
     const signupArea =
         document.getElementById("signupArea");
 
-
     if (currentUser) {
 
         loggedInArea.classList.remove("hidden");
-
         loginArea.classList.add("hidden");
-
         signupArea.classList.add("hidden");
-
 
         document.getElementById("accountName")
             .textContent = currentUser.name || "";
@@ -1197,9 +1210,7 @@ function updateAccountUI() {
     } else {
 
         loggedInArea.classList.add("hidden");
-
         loginArea.classList.remove("hidden");
-
         signupArea.classList.remove("hidden");
     }
 }
@@ -1242,7 +1253,6 @@ async function submitBuyerRequest() {
     const targetCountry =
         document.getElementById("targetCountry").value.trim();
 
-
     if (!requirement) {
 
         showMessage(
@@ -1253,7 +1263,6 @@ async function submitBuyerRequest() {
 
         return;
     }
-
 
     try {
 
@@ -1272,7 +1281,6 @@ async function submitBuyerRequest() {
             }
         );
 
-
         if (data.status === "success") {
 
             buyerRequests.push(data.request);
@@ -1282,11 +1290,8 @@ async function submitBuyerRequest() {
                 JSON.stringify(buyerRequests)
             );
 
-
             renderBuyerRequests();
-
             updateStats();
-
 
             showMessage(
                 "buyerMessage",
@@ -1294,14 +1299,11 @@ async function submitBuyerRequest() {
                 "success"
             );
 
-
             document.getElementById("productInput").value = "";
             document.getElementById("buyerQuantity").value = "";
             document.getElementById("buyerBudget").value = "";
             document.getElementById("targetCountry").value = "";
-
         }
-
 
     } catch (error) {
 
@@ -1326,7 +1328,6 @@ function renderBuyerRequests() {
     const sellerList =
         document.getElementById("sellerRequestList");
 
-
     if (buyerRequests.length === 0) {
 
         buyerList.innerHTML =
@@ -1337,7 +1338,6 @@ function renderBuyerRequests() {
 
         return;
     }
-
 
     let html = "";
 
@@ -1374,9 +1374,7 @@ function renderBuyerRequests() {
         `;
     });
 
-
     buyerList.innerHTML = html;
-
     sellerList.innerHTML = html;
 }
 
@@ -1393,7 +1391,6 @@ function verifyBusiness() {
     const country =
         document.getElementById("businessCountry").value.trim();
 
-
     if (!company || !country) {
 
         showMessage(
@@ -1405,7 +1402,6 @@ function verifyBusiness() {
         return;
     }
 
-
     businessVerified = true;
 
     localStorage.setItem(
@@ -1413,11 +1409,9 @@ function verifyBusiness() {
         "true"
     );
 
-
     document.getElementById(
         "verificationStat"
     ).textContent = "✓";
-
 
     showMessage(
         "verificationMessage",
@@ -1451,7 +1445,6 @@ async function publishProduct() {
     const country =
         document.getElementById("sellerCountry").value.trim();
 
-
     if (!name || !price || !moq || !country) {
 
         showMessage(
@@ -1462,7 +1455,6 @@ async function publishProduct() {
 
         return;
     }
-
 
     try {
 
@@ -1485,7 +1477,6 @@ async function publishProduct() {
             }
         );
 
-
         if (data.status === "success") {
 
             sellerProducts.push(data.product);
@@ -1495,11 +1486,8 @@ async function publishProduct() {
                 JSON.stringify(sellerProducts)
             );
 
-
             renderProducts();
-
             updateStats();
-
 
             showMessage(
                 "productMessage",
@@ -1507,15 +1495,12 @@ async function publishProduct() {
                 "success"
             );
 
-
             document.getElementById("productName").value = "";
             document.getElementById("productDescription").value = "";
             document.getElementById("productPrice").value = "";
             document.getElementById("productMOQ").value = "";
             document.getElementById("sellerCountry").value = "";
-
         }
-
 
     } catch (error) {
 
@@ -1537,7 +1522,6 @@ function renderProducts() {
     const container =
         document.getElementById("publishedProducts");
 
-
     if (sellerProducts.length === 0) {
 
         container.innerHTML =
@@ -1545,7 +1529,6 @@ function renderProducts() {
 
         return;
     }
-
 
     let html = "";
 
@@ -1596,10 +1579,15 @@ function renderProducts() {
                     Seller Profile
                 </button>
 
+                <button
+                    class="success"
+                    onclick="openOrder(${index})">
+                    Order Now
+                </button>
+
             </div>
         `;
     });
-
 
     container.innerHTML = html;
 }
@@ -1614,7 +1602,6 @@ function viewProduct(index) {
     const product = sellerProducts[index];
 
     if (!product) return;
-
 
     document.getElementById("productDetails").innerHTML = `
 
@@ -1650,8 +1637,13 @@ function viewProduct(index) {
             onclick="showSection('negotiation')">
             Start Negotiation
         </button>
-    `;
 
+        <button
+            class="success"
+            onclick="openOrder(${index})">
+            Order Now
+        </button>
+    `;
 
     showSection("productDetailsSection");
 }
@@ -1666,7 +1658,6 @@ function viewSeller(index) {
     const product = sellerProducts[index];
 
     if (!product) return;
-
 
     document.getElementById("sellerProfile").innerHTML = `
 
@@ -1688,8 +1679,394 @@ function viewSeller(index) {
         </p>
     `;
 
-
     showSection("sellerProfileSection");
+}
+
+
+/* =========================================================
+   ORDER NOW
+   ========================================================= */
+
+function openOrder(index) {
+
+    const product = sellerProducts[index];
+
+    if (!product) return;
+
+    const buyerName =
+        currentUser ? currentUser.name : "";
+
+    const buyerEmail =
+        currentUser ? currentUser.email : "";
+
+    const defaultQuantity =
+        Number(product.moq) > 0 ? Number(product.moq) : 1;
+
+    document.getElementById("productDetails").innerHTML = `
+
+        <h2>🛒 Create Order</h2>
+
+        <div class="card">
+
+            <h3>${escapeHTML(product.name)}</h3>
+
+            <p>
+                <strong>Seller:</strong>
+                ${escapeHTML(product.seller || "TAAVO Seller")}
+            </p>
+
+            <p>
+                <strong>Unit Price:</strong>
+                ${escapeHTML(product.price)}
+                ${escapeHTML(product.currency)}
+            </p>
+
+            <p>
+                <strong>MOQ:</strong>
+                ${escapeHTML(product.moq)}
+            </p>
+
+            <div class="form-grid">
+
+                <div>
+                    <label>Buyer Name</label>
+                    <input
+                        id="orderBuyerName"
+                        value="${escapeHTML(buyerName)}"
+                        placeholder="Buyer name">
+                </div>
+
+                <div>
+                    <label>Buyer Email</label>
+                    <input
+                        id="orderBuyerEmail"
+                        type="email"
+                        value="${escapeHTML(buyerEmail)}"
+                        placeholder="Buyer email">
+                </div>
+
+                <div>
+                    <label>Quantity</label>
+                    <input
+                        id="orderQuantity"
+                        type="number"
+                        min="${Number(product.moq) || 1}"
+                        value="${defaultQuantity}"
+                        oninput="calculateOrderTotal(${index})">
+                </div>
+
+            </div>
+
+            <div id="orderTotalBox" class="result-box">
+                Total:
+                <strong>
+                    ${calculateTotal(product.price, defaultQuantity)}
+                    ${escapeHTML(product.currency)}
+                </strong>
+            </div>
+
+            <br>
+
+            <button
+                class="success"
+                onclick="createOrder(${index})">
+                Create Order
+            </button>
+
+            <button
+                class="dark"
+                onclick="viewProduct(${index})">
+                Back to Product
+            </button>
+
+            <div id="orderMessage" class="message"></div>
+
+        </div>
+    `;
+
+    showSection("productDetailsSection");
+}
+
+
+/* =========================================================
+   ORDER TOTAL
+   ========================================================= */
+
+function calculateTotal(price, quantity) {
+
+    const p = Number(price) || 0;
+    const q = Number(quantity) || 0;
+
+    return (p * q).toFixed(2);
+}
+
+
+function calculateOrderTotal(index) {
+
+    const product = sellerProducts[index];
+
+    if (!product) return;
+
+    const quantity =
+        Number(document.getElementById("orderQuantity").value) || 0;
+
+    const total =
+        calculateTotal(product.price, quantity);
+
+    const box =
+        document.getElementById("orderTotalBox");
+
+    if (box) {
+
+        box.innerHTML = `
+            Total:
+            <strong>
+                ${total}
+                ${escapeHTML(product.currency)}
+            </strong>
+        `;
+    }
+}
+
+
+/* =========================================================
+   CREATE ORDER
+   ========================================================= */
+
+async function createOrder(index) {
+
+    const product = sellerProducts[index];
+
+    if (!product) return;
+
+    const buyer =
+        document.getElementById("orderBuyerName").value.trim();
+
+    const buyerEmail =
+        document.getElementById("orderBuyerEmail").value.trim();
+
+    const quantity =
+        Number(document.getElementById("orderQuantity").value);
+
+    const minQuantity =
+        Number(product.moq) || 1;
+
+    if (!buyer || !buyerEmail) {
+
+        showMessage(
+            "orderMessage",
+            "Please enter buyer name and email.",
+            "error"
+        );
+
+        return;
+    }
+
+    if (!quantity || quantity <= 0) {
+
+        showMessage(
+            "orderMessage",
+            "Please enter a valid order quantity.",
+            "error"
+        );
+
+        return;
+    }
+
+    if (quantity < minQuantity) {
+
+        showMessage(
+            "orderMessage",
+            "Order quantity cannot be less than MOQ: " + minQuantity,
+            "error"
+        );
+
+        return;
+    }
+
+    showMessage(
+        "orderMessage",
+        "Creating order...",
+        "info"
+    );
+
+    try {
+
+        const data = await apiRequest(
+            "/api/orders",
+            {
+                method: "POST",
+
+                body: JSON.stringify({
+
+                    productId:
+                        product.id !== undefined
+                            ? product.id
+                            : null,
+
+                    quantity: quantity,
+
+                    buyer: buyer,
+
+                    buyerEmail: buyerEmail,
+
+                    productName: product.name,
+
+                    productDescription:
+                        product.description || "",
+
+                    productPrice:
+                        Number(product.price) || 0,
+
+                    productCurrency:
+                        product.currency || "USD",
+
+                    productMOQ:
+                        Number(product.moq) || 1,
+
+                    productCountry:
+                        product.country || "",
+
+                    productSeller:
+                        product.seller || "TAAVO Seller"
+                })
+            }
+        );
+
+        if (data.status === "success") {
+
+            showMessage(
+                "orderMessage",
+                "✓ Order created successfully! Order #" +
+                data.order.id,
+                "success"
+            );
+
+            setTimeout(() => {
+                showSection("orders");
+                loadOrders();
+            }, 700);
+
+        } else {
+
+            showMessage(
+                "orderMessage",
+                data.message || "Order failed.",
+                "error"
+            );
+        }
+
+    } catch (error) {
+
+        showMessage(
+            "orderMessage",
+            "× Order failed: " + error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   LOAD ORDERS
+   ========================================================= */
+
+async function loadOrders() {
+
+    const container =
+        document.getElementById("ordersList");
+
+    if (!container) return;
+
+    container.innerHTML =
+        "Loading orders...";
+
+    try {
+
+        const data =
+            await apiRequest("/api/orders");
+
+        const orders =
+            data.orders || [];
+
+        if (orders.length === 0) {
+
+            container.innerHTML = `
+                <h3>No orders yet.</h3>
+                <p>
+                    Orders created through TAAVO will appear here.
+                </p>
+            `;
+
+            return;
+        }
+
+        let html = "";
+
+        orders.slice().reverse().forEach(order => {
+
+            html += `
+
+                <div class="order-card">
+
+                    <h2>
+                        Order #${escapeHTML(order.id)}
+                    </h2>
+
+                    <p>
+                        <strong>Product:</strong>
+                        ${escapeHTML(order.productName)}
+                    </p>
+
+                    <p>
+                        <strong>Seller:</strong>
+                        ${escapeHTML(order.seller)}
+                    </p>
+
+                    <p>
+                        <strong>Buyer:</strong>
+                        ${escapeHTML(order.buyer)}
+                    </p>
+
+                    <p>
+                        <strong>Quantity:</strong>
+                        ${escapeHTML(order.quantity)}
+                    </p>
+
+                    <p>
+                        <strong>Unit Price:</strong>
+                        ${escapeHTML(order.unitPrice)}
+                        ${escapeHTML(order.currency)}
+                    </p>
+
+                    <p>
+                        <strong>Total:</strong>
+                        ${escapeHTML(order.total)}
+                        ${escapeHTML(order.currency)}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        <span class="order-status">
+                            ${escapeHTML(order.status)}
+                        </span>
+                    </p>
+
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+
+    } catch (error) {
+
+        container.innerHTML = `
+            <div class="message show error-msg">
+                × Could not load orders:
+                ${escapeHTML(error.message)}
+            </div>
+        `;
+    }
 }
 
 
@@ -1715,7 +2092,6 @@ function runAIMatch() {
             .trim()
             .toLowerCase();
 
-
     if (!requirement) {
 
         document.getElementById(
@@ -1725,7 +2101,6 @@ function runAIMatch() {
 
         return;
     }
-
 
     const results =
         sellerProducts
@@ -1740,14 +2115,12 @@ function runAIMatch() {
                         product.description
                     ).toLowerCase();
 
-
                 if (
                     productText.includes(requirement) ||
                     requirement.includes(product.name.toLowerCase())
                 ) {
                     score += 50;
                 }
-
 
                 if (
                     country &&
@@ -1758,7 +2131,6 @@ function runAIMatch() {
                     score += 20;
                 }
 
-
                 if (
                     budget &&
                     Number(product.price) <= budget
@@ -1766,14 +2138,12 @@ function runAIMatch() {
                     score += 20;
                 }
 
-
                 if (
                     quantity &&
                     Number(product.moq) <= quantity
                 ) {
                     score += 10;
                 }
-
 
                 return {
                     product,
@@ -1783,10 +2153,8 @@ function runAIMatch() {
             .filter(item => item.score > 0)
             .sort((a,b) => b.score - a.score);
 
-
     const container =
         document.getElementById("aiMatchResults");
-
 
     if (results.length === 0) {
 
@@ -1800,9 +2168,7 @@ function runAIMatch() {
         return;
     }
 
-
     let html = "<h2>AI Match Results</h2>";
-
 
     results.forEach(item => {
 
@@ -1836,10 +2202,15 @@ function runAIMatch() {
                     View Product
                 </button>
 
+                <button
+                    class="success"
+                    onclick="openOrder(${sellerProducts.indexOf(item.product)})">
+                    Order Now
+                </button>
+
             </div>
         `;
     });
-
 
     container.innerHTML = html;
 }
@@ -1855,7 +2226,6 @@ function matchRequest(index) {
 
     if (!request) return;
 
-
     document.getElementById("aiMatchInput").value =
         request.requirement;
 
@@ -1867,7 +2237,6 @@ function matchRequest(index) {
 
     document.getElementById("aiMatchCountry").value =
         request.targetCountry;
-
 
     showSection("match");
 
@@ -1891,7 +2260,6 @@ function translateCommunication() {
         document.getElementById("communicationMessage")
             .value.trim();
 
-
     if (!message) {
 
         document.getElementById(
@@ -1901,7 +2269,6 @@ function translateCommunication() {
 
         return;
     }
-
 
     document.getElementById(
         "communicationResult"
@@ -1948,7 +2315,6 @@ function prepareNegotiation() {
     const terms =
         document.getElementById("negotiationTerms").value;
 
-
     if (!price || !quantity) {
 
         document.getElementById(
@@ -1958,7 +2324,6 @@ function prepareNegotiation() {
 
         return;
     }
-
 
     document.getElementById(
         "negotiationResult"
@@ -2004,7 +2369,6 @@ function homeSearch() {
             .value.trim();
 
     if (!query) return;
-
 
     document.getElementById(
         "aiMatchInput"
@@ -2072,3 +2436,4 @@ testBackend();
 
 </body>
 </html>
+```
