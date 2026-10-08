@@ -20,20 +20,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# =========================================================
-# IN-MEMORY MVP DATA
-# =========================================================
-
 users = {}
 products = []
 buyer_requests = []
 orders = []
 payments = []
+shipments = []
 
 
-# =========================================================
+# =========================
 # MODELS
-# =========================================================
+# =========================
 
 class SignupData(BaseModel):
     name: str
@@ -94,25 +91,21 @@ class PaymentData(BaseModel):
     method: str
 
 
-class ShippingData(BaseModel):
+class ShipmentData(BaseModel):
     orderId: int
-    carrier: str
-    trackingNumber: str
-    origin: Optional[str] = ""
-    destination: Optional[str] = ""
+    buyer: str
+    buyerEmail: str
+    carrier: str = "TAAVO Logistics"
     estimatedDelivery: Optional[str] = ""
 
 
-class TrackingUpdateData(BaseModel):
-    orderId: int
+class ShipmentStatusData(BaseModel):
     status: str
-    location: Optional[str] = ""
-    note: Optional[str] = ""
 
 
-# =========================================================
-# ROOT
-# =========================================================
+# =========================
+# ROOT / STATUS
+# =========================
 
 @app.get("/")
 def root():
@@ -127,10 +120,6 @@ def root():
         "version": "4.0.0"
     }
 
-
-# =========================================================
-# STATUS
-# =========================================================
 
 @app.get("/api/status")
 def status():
@@ -152,9 +141,9 @@ def test():
     }
 
 
-# =========================================================
+# =========================
 # SIGNUP
-# =========================================================
+# =========================
 
 @app.post("/api/signup")
 def signup(data: SignupData):
@@ -193,9 +182,9 @@ def signup(data: SignupData):
     }
 
 
-# =========================================================
+# =========================
 # LOGIN
-# =========================================================
+# =========================
 
 @app.post("/api/login")
 def login(data: LoginData):
@@ -220,9 +209,9 @@ def login(data: LoginData):
     }
 
 
-# =========================================================
+# =========================
 # BUYER REQUESTS
-# =========================================================
+# =========================
 
 @app.post("/api/buyer-requests")
 def create_buyer_request(data: BuyerRequestData):
@@ -263,7 +252,10 @@ def get_buyer_requests():
 def seller_reply(data: SellerReplyData):
 
     request = next(
-        (item for item in buyer_requests if item["id"] == data.requestId),
+        (
+            item for item in buyer_requests
+            if item["id"] == data.requestId
+        ),
         None
     )
 
@@ -297,9 +289,9 @@ def seller_reply(data: SellerReplyData):
     }
 
 
-# =========================================================
+# =========================
 # PRODUCTS
-# =========================================================
+# =========================
 
 @app.post("/api/products")
 def create_product(data: ProductData):
@@ -333,9 +325,9 @@ def get_products():
     }
 
 
-# =========================================================
+# =========================
 # ORDERS
-# =========================================================
+# =========================
 
 @app.post("/api/orders")
 def create_order(data: OrderData):
@@ -355,11 +347,9 @@ def create_order(data: OrderData):
     product = None
 
     if data.productId is not None:
-
         product = next(
             (
-                item
-                for item in products
+                item for item in products
                 if int(item["id"]) == int(data.productId)
             ),
             None
@@ -403,25 +393,11 @@ def create_order(data: OrderData):
         "unitPrice": float(product["price"]),
         "currency": product["currency"],
         "total": total,
-
-        # ORDER FLOW
         "status": "Pending",
-
-        # PAYMENT
         "paymentStatus": "Unpaid",
         "paymentId": None,
-
-        # SHIPPING
-        "shippingStatus": "Not Shipped",
-        "carrier": None,
-        "trackingNumber": None,
-        "origin": None,
-        "destination": None,
-        "estimatedDelivery": None,
-
-        # TRACKING
-        "trackingEvents": [],
-
+        "shipmentId": None,
+        "trackingId": None,
         "createdAt": datetime.utcnow().isoformat() + "Z"
     }
 
@@ -447,7 +423,10 @@ def get_orders():
 def get_order(order_id: int):
 
     order = next(
-        (item for item in orders if item["id"] == order_id),
+        (
+            item for item in orders
+            if item["id"] == order_id
+        ),
         None
     )
 
@@ -463,15 +442,18 @@ def get_order(order_id: int):
     }
 
 
-# =========================================================
-# PAYMENT
-# =========================================================
+# =========================
+# PAYMENTS
+# =========================
 
 @app.post("/api/payments")
 def create_payment(data: PaymentData):
 
     order = next(
-        (item for item in orders if item["id"] == data.orderId),
+        (
+            item for item in orders
+            if item["id"] == data.orderId
+        ),
         None
     )
 
@@ -546,7 +528,10 @@ def get_payments():
 def get_payment(payment_id: str):
 
     payment = next(
-        (item for item in payments if item["id"] == payment_id),
+        (
+            item for item in payments
+            if item["id"] == payment_id
+        ),
         None
     )
 
@@ -562,15 +547,18 @@ def get_payment(payment_id: str):
     }
 
 
-# =========================================================
+# =========================
 # SHIPPING
-# =========================================================
+# =========================
 
-@app.post("/api/shipping")
-def create_shipping(data: ShippingData):
+@app.post("/api/shipments")
+def create_shipment(data: ShipmentData):
 
     order = next(
-        (item for item in orders if item["id"] == data.orderId),
+        (
+            item for item in orders
+            if item["id"] == data.orderId
+        ),
         None
     )
 
@@ -583,65 +571,113 @@ def create_shipping(data: ShippingData):
     if order["paymentStatus"] != "Paid":
         return {
             "status": "error",
-            "message": "Order must be paid before shipping."
+            "message": "Payment must be completed before shipping."
         }
 
-    if not data.carrier.strip():
+    existing = next(
+        (
+            item for item in shipments
+            if item["orderId"] == data.orderId
+        ),
+        None
+    )
+
+    if existing:
         return {
             "status": "error",
-            "message": "Shipping carrier is required."
+            "message": "Shipment already exists for this order.",
+            "shipment": existing
         }
 
-    if not data.trackingNumber.strip():
-        return {
-            "status": "error",
-            "message": "Tracking number is required."
-        }
+    shipment_id = len(shipments) + 1
+    tracking_id = f"TAAVO-{shipment_id:06d}"
 
-    order["shippingStatus"] = "Shipped"
-    order["status"] = "Shipped"
-    order["carrier"] = data.carrier.strip()
-    order["trackingNumber"] = data.trackingNumber.strip()
-    order["origin"] = data.origin.strip()
-    order["destination"] = data.destination.strip()
-    order["estimatedDelivery"] = data.estimatedDelivery.strip()
-
-    tracking_event = {
-        "status": "Shipped",
-        "location": data.origin.strip(),
-        "note": "Shipment created and handed to carrier.",
-        "createdAt": datetime.utcnow().isoformat() + "Z"
+    shipment = {
+        "id": shipment_id,
+        "trackingId": tracking_id,
+        "orderId": data.orderId,
+        "buyer": data.buyer.strip(),
+        "buyerEmail": data.buyerEmail.strip().lower(),
+        "productName": order["productName"],
+        "seller": order["seller"],
+        "quantity": order["quantity"],
+        "carrier": data.carrier.strip() or "TAAVO Logistics",
+        "status": "Preparing",
+        "estimatedDelivery": data.estimatedDelivery or "",
+        "createdAt": datetime.utcnow().isoformat() + "Z",
+        "updatedAt": datetime.utcnow().isoformat() + "Z"
     }
 
-    order["trackingEvents"].append(tracking_event)
+    shipments.append(shipment)
+
+    order["shipmentId"] = shipment_id
+    order["trackingId"] = tracking_id
+    order["status"] = "Preparing for Shipment"
 
     return {
         "status": "success",
         "message": "Shipment created successfully!",
+        "shipment": shipment,
         "order": order
     }
 
 
-# =========================================================
-# TRACKING UPDATE
-# =========================================================
+@app.get("/api/shipments")
+def get_shipments():
 
-@app.post("/api/shipping/tracking")
-def update_tracking(data: TrackingUpdateData):
+    return {
+        "status": "success",
+        "shipments": shipments
+    }
 
-    order = next(
-        (item for item in orders if item["id"] == data.orderId),
+
+@app.get("/api/shipments/{tracking_id}")
+def track_shipment(tracking_id: str):
+
+    shipment = next(
+        (
+            item for item in shipments
+            if item["trackingId"].lower()
+            == tracking_id.lower()
+        ),
         None
     )
 
-    if not order:
+    if not shipment:
         return {
             "status": "error",
-            "message": "Order not found."
+            "message": "Tracking ID not found."
+        }
+
+    return {
+        "status": "success",
+        "shipment": shipment
+    }
+
+
+@app.put("/api/shipments/{tracking_id}/status")
+def update_shipment_status(
+    tracking_id: str,
+    data: ShipmentStatusData
+):
+
+    shipment = next(
+        (
+            item for item in shipments
+            if item["trackingId"].lower()
+            == tracking_id.lower()
+        ),
+        None
+    )
+
+    if not shipment:
+        return {
+            "status": "error",
+            "message": "Tracking ID not found."
         }
 
     allowed_statuses = [
-        "Processing",
+        "Preparing",
         "Shipped",
         "In Transit",
         "Out for Delivery",
@@ -651,83 +687,56 @@ def update_tracking(data: TrackingUpdateData):
     if data.status not in allowed_statuses:
         return {
             "status": "error",
-            "message": "Invalid tracking status."
+            "message": "Invalid shipment status."
         }
 
-    event = {
-        "status": data.status,
-        "location": data.location.strip(),
-        "note": data.note.strip(),
-        "createdAt": datetime.utcnow().isoformat() + "Z"
-    }
+    shipment["status"] = data.status
+    shipment["updatedAt"] = datetime.utcnow().isoformat() + "Z"
 
-    order["trackingEvents"].append(event)
+    order = next(
+        (
+            item for item in orders
+            if item["id"] == shipment["orderId"]
+        ),
+        None
+    )
 
-    order["status"] = data.status
+    if order:
+        if data.status == "Preparing":
+            order["status"] = "Preparing"
 
-    if data.status == "Shipped":
-        order["shippingStatus"] = "Shipped"
+        elif data.status == "Shipped":
+            order["status"] = "Shipped"
 
-    elif data.status == "In Transit":
-        order["shippingStatus"] = "In Transit"
+        elif data.status == "In Transit":
+            order["status"] = "In Transit"
 
-    elif data.status == "Out for Delivery":
-        order["shippingStatus"] = "Out for Delivery"
+        elif data.status == "Out for Delivery":
+            order["status"] = "Out for Delivery"
 
-    elif data.status == "Delivered":
-        order["shippingStatus"] = "Delivered"
+        elif data.status == "Delivered":
+            order["status"] = "Delivered"
 
     return {
         "status": "success",
-        "message": "Tracking updated successfully!",
+        "message": "Shipment status updated successfully!",
+        "shipment": shipment,
         "order": order
     }
 
 
-# =========================================================
-# TRACKING DETAILS
-# =========================================================
-
-@app.get("/api/orders/{order_id}/tracking")
-def get_tracking(order_id: int):
-
-    order = next(
-        (item for item in orders if item["id"] == order_id),
-        None
-    )
-
-    if not order:
-        return {
-            "status": "error",
-            "message": "Order not found."
-        }
-
-    return {
-        "status": "success",
-        "orderId": order["id"],
-        "shippingStatus": order["shippingStatus"],
-        "carrier": order["carrier"],
-        "trackingNumber": order["trackingNumber"],
-        "origin": order["origin"],
-        "destination": order["destination"],
-        "estimatedDelivery": order["estimatedDelivery"],
-        "trackingEvents": order["trackingEvents"]
-    }
-
-
-# =========================================================
+# =========================
 # STARTUP
-# =========================================================
+# =========================
 
 @app.on_event("startup")
 async def startup_message():
 
-    print("==========================================")
+    print("======================================")
     print("TAAVO Backend started successfully")
     print("TAAVO API version: 4.0.0")
     print("Orders API: ENABLED")
     print("Payment API: ENABLED")
     print("Shipping API: ENABLED")
     print("Tracking API: ENABLED")
-    print("Delivery API: ENABLED")
-    print("==========================================")
+    print("======================================")
