@@ -6,10 +6,22 @@ from typing import Optional
 from datetime import datetime
 import os
 
+
+# =========================================================
+# TAAVO — TRADE WITHOUT BORDERS
+# Backend
+# =========================================================
+
 app = FastAPI(
     title="TAAVO",
-    version="1.5.0"
+    description="TAAVO Global B2B Trade Infrastructure",
+    version="2.0.0"
 )
+
+
+# =========================================================
+# CORS
+# =========================================================
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,15 +31,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# =========================================================
+# IN-MEMORY DATABASE
+# =========================================================
+
 users = {}
 products = []
 buyer_requests = []
 orders = []
 
 
-# =========================
+# =========================================================
 # DATA MODELS
-# =========================
+# =========================================================
 
 class SignupData(BaseModel):
     name: str
@@ -67,25 +84,39 @@ class SellerReplyData(BaseModel):
 
 class OrderData(BaseModel):
     productId: Optional[int] = None
+
     quantity: float
+
     buyer: str
     buyerEmail: str
 
     productName: Optional[str] = ""
     productDescription: Optional[str] = ""
+
     productPrice: Optional[float] = 0
     productCurrency: Optional[str] = "USD"
+
     productMOQ: Optional[float] = 1
     productCountry: Optional[str] = ""
+
     productSeller: Optional[str] = "TAAVO Seller"
 
 
-# =========================
+# =========================================================
+# HELPER
+# =========================================================
+
+def now():
+    return datetime.utcnow().isoformat() + "Z"
+
+
+# =========================================================
 # ROOT
-# =========================
+# =========================================================
 
 @app.get("/")
 def root():
+
     index_path = os.path.join(
         os.path.dirname(__file__),
         "index.html"
@@ -95,56 +126,60 @@ def root():
         return FileResponse(index_path)
 
     return {
+        "success": True,
         "name": "TAAVO",
         "message": "TAAVO Backend is running",
-        "version": "1.5.0"
+        "version": "2.0.0"
     }
 
 
-# =========================
+# =========================================================
 # STATUS
-# =========================
+# =========================================================
 
 @app.get("/api/status")
 def status():
+
     return {
         "success": True,
         "status": "online",
         "service": "TAAVO Backend",
-        "version": "1.5.0",
-        "stage": "Orders"
+        "version": "2.0.0",
+        "stage": "Foundation + Orders",
+        "orders_api": True
     }
 
 
 @app.get("/api/test")
 def test():
+
     return {
         "success": True,
         "message": "TAAVO API test successful",
-        "version": "1.5.0"
+        "version": "2.0.0"
     }
 
 
-# =========================
+# =========================================================
 # SIGNUP
-# =========================
+# =========================================================
 
 @app.post("/api/signup")
 def signup(data: SignupData):
 
+    name = data.name.strip()
     email = data.email.strip().lower()
+    password = data.password
 
-    if (
-        not data.name.strip()
-        or not email
-        or not data.password
-    ):
+    if not name or not email or not password:
+
         return {
             "status": "error",
             "message": "All fields are required."
         }
 
     if email in users:
+
         return {
             "status": "error",
             "message": "An account with this email already exists."
@@ -157,14 +192,14 @@ def signup(data: SignupData):
     )
 
     user = {
-        "name": data.name.strip(),
+        "name": name,
         "email": email,
         "role": role
     }
 
     users[email] = {
         **user,
-        "password": data.password
+        "password": password
     }
 
     return {
@@ -174,9 +209,9 @@ def signup(data: SignupData):
     }
 
 
-# =========================
+# =========================================================
 # LOGIN
-# =========================
+# =========================================================
 
 @app.post("/api/login")
 def login(data: LoginData):
@@ -185,10 +220,15 @@ def login(data: LoginData):
 
     user = users.get(email)
 
-    if (
-        not user
-        or user["password"] != data.password
-    ):
+    if not user:
+
+        return {
+            "status": "error",
+            "message": "Invalid email or password."
+        }
+
+    if user["password"] != data.password:
+
         return {
             "status": "error",
             "message": "Invalid email or password."
@@ -205,25 +245,42 @@ def login(data: LoginData):
     }
 
 
-# =========================
-# BUYER REQUEST
-# =========================
+# =========================================================
+# BUYER REQUESTS
+# =========================================================
 
 @app.post("/api/buyer-requests")
 def create_buyer_request(data: BuyerRequestData):
+
+    requirement = data.requirement.strip()
+
+    if not requirement:
+
+        return {
+            "status": "error",
+            "message": "Product requirement is required."
+        }
 
     request_id = len(buyer_requests) + 1
 
     request = {
         "id": request_id,
-        "requirement": data.requirement.strip(),
+
+        "requirement": requirement,
+
         "quantity": data.quantity or "",
+
         "budget": data.budget or "",
+
         "currency": data.currency or "USD",
+
         "targetCountry": data.targetCountry or "",
+
         "status": "Pending",
+
         "replies": [],
-        "createdAt": datetime.utcnow().isoformat() + "Z"
+
+        "createdAt": now()
     }
 
     buyer_requests.append(request)
@@ -244,9 +301,9 @@ def get_buyer_requests():
     }
 
 
-# =========================
+# =========================================================
 # SELLER REPLY
-# =========================
+# =========================================================
 
 @app.post("/api/buyer-requests/reply")
 def seller_reply(data: SellerReplyData):
@@ -261,6 +318,7 @@ def seller_reply(data: SellerReplyData):
     )
 
     if not request:
+
         return {
             "status": "error",
             "message": "Buyer request not found."
@@ -269,18 +327,25 @@ def seller_reply(data: SellerReplyData):
     message = data.message.strip()
 
     if not message:
+
         return {
             "status": "error",
             "message": "Reply message is required."
         }
 
     reply = {
-        "sender": data.seller.strip() or "TAAVO Seller",
+        "sender": (
+            data.seller.strip()
+            or "TAAVO Seller"
+        ),
+
         "message": message,
-        "createdAt": datetime.utcnow().isoformat() + "Z"
+
+        "createdAt": now()
     }
 
     request["replies"].append(reply)
+
     request["status"] = "Seller Replied"
 
     return {
@@ -290,22 +355,66 @@ def seller_reply(data: SellerReplyData):
     }
 
 
-# =========================
+# =========================================================
 # PRODUCTS
-# =========================
+# =========================================================
 
 @app.post("/api/products")
 def create_product(data: ProductData):
 
+    name = data.name.strip()
+    country = data.country.strip()
+
+    if not name:
+
+        return {
+            "status": "error",
+            "message": "Product name is required."
+        }
+
+    if data.price < 0:
+
+        return {
+            "status": "error",
+            "message": "Product price cannot be negative."
+        }
+
+    if data.moq <= 0:
+
+        return {
+            "status": "error",
+            "message": "MOQ must be greater than 0."
+        }
+
+    if not country:
+
+        return {
+            "status": "error",
+            "message": "Seller country is required."
+        }
+
     product = {
+
         "id": len(products) + 1,
-        "name": data.name.strip(),
+
+        "name": name,
+
         "description": data.description or "",
-        "price": data.price,
-        "currency": data.currency,
-        "moq": data.moq,
-        "country": data.country.strip(),
-        "seller": data.seller.strip() or "Unknown Seller"
+
+        "price": float(data.price),
+
+        "currency": data.currency or "USD",
+
+        "moq": float(data.moq),
+
+        "country": country,
+
+        "seller": (
+            data.seller.strip()
+            or "Unknown Seller"
+        ),
+
+        "createdAt": now()
     }
 
     products.append(product)
@@ -326,146 +435,308 @@ def get_products():
     }
 
 
-# =========================
-# ORDERS
-# =========================
+# =========================================================
+# CREATE ORDER
+# =========================================================
 
 @app.post("/api/orders")
 def create_order(data: OrderData):
 
-    # Validate quantity
+    # -----------------------------------------------------
+    # 1. BASIC VALIDATION
+    # -----------------------------------------------------
+
     if data.quantity <= 0:
+
         return {
             "status": "error",
             "message": "Order quantity must be greater than 0."
         }
 
-    # Validate buyer
-    if (
-        not data.buyer.strip()
-        or not data.buyerEmail.strip()
-    ):
+    buyer = data.buyer.strip()
+    buyer_email = data.buyerEmail.strip().lower()
+
+    if not buyer or not buyer_email:
+
         return {
             "status": "error",
-            "message": "Buyer account information is required."
+            "message": "Buyer name and email are required."
         }
+
+
+    # -----------------------------------------------------
+    # 2. FIND PRODUCT BY ID
+    # -----------------------------------------------------
 
     product = None
 
-    # -------------------------
-    # STEP 1
-    # Find existing product
-    # -------------------------
-
     if data.productId is not None:
 
-        product = next(
-            (
-                item
-                for item in products
-                if int(item["id"]) == int(data.productId)
-            ),
-            None
-        )
+        try:
 
-    # -------------------------
-    # STEP 2
-    # Reconstruct product
-    # from snapshot if needed
-    # -------------------------
+            requested_product_id = int(data.productId)
+
+            product = next(
+                (
+                    item
+                    for item in products
+                    if int(item["id"]) == requested_product_id
+                ),
+                None
+            )
+
+        except (ValueError, TypeError):
+
+            product = None
+
+
+    # -----------------------------------------------------
+    # 3. FALLBACK PRODUCT SNAPSHOT
+    # -----------------------------------------------------
 
     if (
-        not product
+        product is None
         and data.productName
         and data.productName.strip()
     ):
 
-        new_product = {
+        snapshot_name = data.productName.strip()
+
+        snapshot_price = float(
+            data.productPrice or 0
+        )
+
+        snapshot_moq = float(
+            data.productMOQ or 1
+        )
+
+        if snapshot_moq <= 0:
+            snapshot_moq = 1
+
+        snapshot_product = {
+
             "id": len(products) + 1,
-            "name": data.productName.strip(),
-            "description": data.productDescription or "",
-            "price": float(data.productPrice or 0),
-            "currency": data.productCurrency or "USD",
-            "moq": float(data.productMOQ or 1),
-            "country": data.productCountry or "",
-            "seller": data.productSeller or "TAAVO Seller"
+
+            "name": snapshot_name,
+
+            "description":
+                data.productDescription or "",
+
+            "price":
+                snapshot_price,
+
+            "currency":
+                data.productCurrency or "USD",
+
+            "moq":
+                snapshot_moq,
+
+            "country":
+                data.productCountry or "",
+
+            "seller":
+                data.productSeller
+                or "TAAVO Seller",
+
+            "createdAt":
+                now()
         }
 
-        products.append(new_product)
-        product = new_product
+        products.append(snapshot_product)
 
-    # -------------------------
-    # STEP 3
-    # No product
-    # -------------------------
+        product = snapshot_product
 
-    if not product:
+
+    # -----------------------------------------------------
+    # 4. PRODUCT REQUIRED
+    # -----------------------------------------------------
+
+    if product is None:
+
         return {
             "status": "error",
             "message": "Product information is missing."
         }
 
-    # -------------------------
-    # STEP 4
-    # Calculate total
-    # -------------------------
+
+    # -----------------------------------------------------
+    # 5. MOQ VALIDATION
+    # -----------------------------------------------------
+
+    product_moq = float(
+        product.get("moq", 1) or 1
+    )
+
+    if data.quantity < product_moq:
+
+        return {
+            "status": "error",
+            "message":
+                f"Order quantity cannot be less than MOQ: {product_moq:g}"
+        }
+
+
+    # -----------------------------------------------------
+    # 6. CALCULATE TOTAL
+    # -----------------------------------------------------
+
+    unit_price = float(
+        product.get("price", 0) or 0
+    )
 
     total = round(
-        float(product["price"]) * float(data.quantity),
+        unit_price * float(data.quantity),
         2
     )
 
-    # -------------------------
-    # STEP 5
-    # Create order
-    # -------------------------
+
+    # -----------------------------------------------------
+    # 7. CREATE ORDER ID
+    # -----------------------------------------------------
+
+    order_id = len(orders) + 1
+
+
+    # -----------------------------------------------------
+    # 8. CREATE ORDER
+    # -----------------------------------------------------
 
     order = {
-        "id": len(orders) + 1,
-        "productId": product["id"],
-        "productName": product["name"],
-        "seller": product["seller"],
-        "buyer": data.buyer.strip(),
-        "buyerEmail": data.buyerEmail.strip().lower(),
-        "quantity": data.quantity,
-        "unitPrice": product["price"],
-        "currency": product["currency"],
-        "total": total,
-        "status": "Pending",
-        "createdAt": datetime.utcnow().isoformat() + "Z"
+
+        "id": order_id,
+
+        "productId":
+            product.get("id"),
+
+        "productName":
+            product.get("name", ""),
+
+        "seller":
+            product.get(
+                "seller",
+                "TAAVO Seller"
+            ),
+
+        "buyer":
+            buyer,
+
+        "buyerEmail":
+            buyer_email,
+
+        "quantity":
+            float(data.quantity),
+
+        "unitPrice":
+            unit_price,
+
+        "currency":
+            product.get(
+                "currency",
+                "USD"
+            ),
+
+        "total":
+            total,
+
+        "status":
+            "Pending",
+
+        "createdAt":
+            now()
     }
+
+
+    # -----------------------------------------------------
+    # 9. SAVE ORDER
+    # -----------------------------------------------------
 
     orders.append(order)
 
+
+    # -----------------------------------------------------
+    # 10. SUCCESS RESPONSE
+    # -----------------------------------------------------
+
     return {
-        "status": "success",
-        "message": "TAAVO order created successfully!",
-        "order": order
+
+        "status":
+            "success",
+
+        "message":
+            "TAAVO order created successfully!",
+
+        "order":
+            order
     }
 
 
-# =========================
-# GET ORDERS
-# =========================
+# =========================================================
+# GET ALL ORDERS
+# =========================================================
 
 @app.get("/api/orders")
 def get_orders():
 
     return {
-        "status": "success",
-        "orders": orders
+
+        "status":
+            "success",
+
+        "orders":
+            orders
     }
 
 
-# =========================
+# =========================================================
+# GET SINGLE ORDER
+# =========================================================
+
+@app.get("/api/orders/{order_id}")
+def get_order(order_id: int):
+
+    order = next(
+        (
+            item
+            for item in orders
+            if int(item["id"]) == order_id
+        ),
+        None
+    )
+
+    if not order:
+
+        return {
+            "status": "error",
+            "message": "Order not found."
+        }
+
+    return {
+
+        "status":
+            "success",
+
+        "order":
+            order
+    }
+
+
+# =========================================================
 # STARTUP
-# =========================
+# =========================================================
 
 @app.on_event("startup")
 async def startup_message():
 
-    print("TAAVO Backend started successfully")
-    print("TAAVO API version: 1.5.0")
+    print("")
+    print("==========================================")
+    print("        TAAVO BACKEND STARTED")
+    print("        Trade Without Borders")
+    print("==========================================")
+    print("TAAVO API Version: 2.0.0")
+    print("Backend Status: ONLINE")
     print("Orders API: ENABLED")
     print("POST /api/orders: ENABLED")
-    print("GET /api/orders: ENABLED")
+    print("GET  /api/orders: ENABLED")
+    print("GET  /api/orders/{order_id}: ENABLED")
+    print("==========================================")
+    print("")
